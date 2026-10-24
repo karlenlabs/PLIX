@@ -1,0 +1,35 @@
+html, body, #root { height: 100%; margin: 0; overflow: auto; background: #11151c; color: #e7ebf3; color-scheme: dark; }
+.visual-tuning-panel { width: 300px; max-width: 100%; min-height: 100%; padding: 14px; margin: 0 auto; font: 12px/1.4 "Segoe UI", sans-serif; }
+.visual-tuning-panel header { display: flex; align-items: center; justify-content: space-between; }
+.visual-tuning-panel header strong { font-size: 16px; }
+.visual-tuning-panel header span { font-size: 9px; color: #a3bce5; }
+.tuning-status, .tuning-message { margin: 8px 0; color: #aeb9cc; font-size: 11px; white-space: normal; }
+.tuning-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.tuning-actions button { display: block; width: auto; height: 29px; padding: 4px; border: 1px solid #364257; border-radius: 5px; background: #202a3a; color: #e7ebf3; font-size: 10px; cursor: pointer; }
+.tuning-actions button:hover:not(:disabled) { background: #303e54; }
+.tuning-actions button:disabled { opacity: .4; cursor: default; }
+.visual-tuning-panel fieldset { padding: 8px 0 3px; margin: 14px 0 0; border: 0; border-top: 1px solid #303a4a; min-width: 0; }
+.visual-tuning-panel legend { padding-right: 8px; font-size: 12px; font-weight: 600; color: #afc5e8; }
+.tuning-field { display: block; margin-bottom: 10px; }
+.tuning-field span { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; font-size: 11px; }
+.tuning-field output { font-variant-numeric: tabular-nums; color: #afc5e8; }
+.tuning-field input[type="range"] { appearance: auto; -webkit-appearance: auto; accent-color: #98b9ef; width: 100%; height: 17px; margin-top: 3px; }
+.tuning-field input[type="range"]::-webkit-slider-runnable-track { height: auto; background: none; }
+.tuning-field input[type="range"]::-webkit-slider-thumb { appearance: auto; -webkit-appearance: auto; opacity: 1; margin: 0; }
+.tuning-export { display: block; margin-top: 12px; }
+.tuning-export textarea { display: block; box-sizing: border-box; width: 100%; height: 180px; margin-top: 5px; padding: 8px; background: #0a0e15; color: #d3dceb; border: 1px solid #364257; font: 10px/1.5 Consolas, monospace; resize: vertical; }
+
+.tuning-popout { display: block; width: 100%; height: 25px; margin-top: 8px; padding: 4px; border: 1px solid #364257; border-radius: 5px; color: #afc5e8; background: #182130; font-size: 10px; }
+.visual-tuning-panel .tuning-help, .visual-tuning-panel details p { color: #aeb9cc; font-size: 11px; line-height: 1.5; white-space: normal; overflow: visible; pointer-events: auto; }
+.tuning-toggle, .tuning-color { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0; }
+.tuning-toggle input { accent-color: #98b9ef; flex: none; }
+.tuning-color input[type="color"] { width: 62px; height: 25px; border: 1px solid #364257; background: transparent; padding: 2px; cursor: pointer; }
+.tuning-select { display: grid; gap: 6px; margin-bottom: 12px; }
+.tuning-select select { width: 100%; height: 30px; color: #e7ebf3; background: #202a3a; border: 1px solid #364257; border-radius: 5px; }
+.tuning-reset { width: 100%; height: 28px; border: 1px solid #364257; border-radius: 5px; background: #202a3a; color: #e7ebf3; font: inherit; }
+.visual-tuning-panel details { margin-top: 14px; }
+.visual-tuning-panel summary { cursor: pointer; color: #afc5e8; }
+.tuning-diagnostics pre { max-height: 350px; overflow: auto; font: 10px/1.5 Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tuning-swatches { display: flex; gap: 4px; margin: 8px 0; }
+.tuning-swatches span { display: grid; place-items: center; flex: 1; height: 32px; color: #fff; text-shadow: 0 1px 3px #000; font: 9px Consolas, monospace; }
+

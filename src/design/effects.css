@@ -1,0 +1,14 @@
+/* A temporary rendering gate. Never overwrite approved or user-tuned values. */
+:root .player[data-player-design][data-visual-effects="false"] {
+  background: var(--design-base-color, rgb(var(--player-surface)));
+  box-shadow: inset 0 0 0 var(--design-border-width) rgba(var(--design-border-rgb), var(--design-border-alpha));
+  transition: none;
+}
+:root .player[data-player-design][data-visual-effects="false"]::before,
+:root .player[data-player-design][data-visual-effects="false"]::after {
+  content: none;
+}
+:root .player[data-visual-effects="false"] > .visualizer-layer { display: none; }
+:root .player[data-visual-effects="false"] .primary-control {
+  box-shadow: none;
+}

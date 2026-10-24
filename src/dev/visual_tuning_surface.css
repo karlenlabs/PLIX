@@ -1,0 +1,23 @@
+/* Same surface renderer in DEV and production. */
+@import "../design/surface.css";
+
+/* DEV-only isolation of the player surface; canvas and controls keep their styles.
+   Flatten the existing base over its opaque underpaint, with no decorative images. */
+:root .player[data-player-design][data-dev-css-highlights="isolated"] {
+  background-image: none !important;
+  background-color: color-mix(in srgb,
+    hsl(from var(--design-base-color) h calc(s * var(--surface-saturation)) calc(l * var(--surface-brightness)))
+      calc(var(--design-base-opacity) * 100%), rgb(var(--surface))) !important;
+}
+/* Warm Cream's opaque underpaint belongs to the current theme. */
+:root[data-theme="light"] .player[data-player-design][data-dev-css-highlights="isolated"] {
+  background-color: rgb(var(--player-surface)) !important;
+}
+:root .player[data-player-design][data-dev-css-highlights="isolated"]::before,
+:root .player[data-player-design][data-dev-css-highlights="isolated"]::after {
+  content: none !important;
+}
+/* Temporary DEV visibility gate. Removing the flag restores the normal cascade. */
+:root .player[data-dev-hide-pixi-canvas="true"] > .visualizer-layer {
+  display: none !important;
+}

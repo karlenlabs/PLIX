@@ -1,0 +1,105 @@
+# React / Vite / package-manager caches (at any depth)
+node_modules/
+dist/
+.vite/
+.vite-temp/
+.npm-cache/
+.npm/
+.pnpm-store/
+coverage/
+*.tsbuildinfo
+
+# Rust / Tauri generated output; keep Cargo.toml and Cargo.lock
+target/
+/cargo-*-target/
+/src-tauri/gen/
+/prototypes/native-backdrop/gen/
+/portable-release-*/
+
+# Local application / WebView profiles and settings
+.runtime/
+*.local
+/user-data/
+/appearance.json
+/window-position.json
+/window_position.json
+
+# Environment credentials; safe templates may be committed after review
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+!.env.*.example
+.cargo/credentials
+.cargo/credentials.toml
+*.pem
+*.key
+*.pfx
+*.p12
+*.keystore
+*.jks
+
+# Local editors and Windows IDE state
+.idea/
+.vs/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.code-workspace
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Backups, temporary files, logs and crash dumps
+backups/
+backup/
+logs/
+tmp/
+temp/
+*.bak
+*.bak.*
+*.backup
+*.old
+*.orig
+*.rej
+*~
+*.tmp
+*.temp
+*.swp
+*.swo
+.~lock.*
+*.log
+*.log.*
+*.stackdump
+*.dmp
+*.etl
+
+# Local work reports and provenance with machine / browser-profile paths
+/*-report.md
+/*-REPORT.md
+/FINAL-AUDIT.md
+/visual-design-*.provenance.json
+
+# Python helper caches
+__pycache__/
+*.py[cod]
+.venv/
+
+# Windows / filesystem metadata
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Private development archives and test suites
+/tests/
+/prototypes/
+/src-tauri/tests/
+**/*_tests.rs
+/start-dev.bat.txt
+/visual-design-*.json

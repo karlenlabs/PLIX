@@ -1,0 +1,54 @@
+/* Approved Soft Raised: the standard production Play/Pause.
+   Geometry, SVG, icon color, focus outline and disabled opacity come from style.css. */
+:root .player button.primary-control {
+  --play-raised-light: rgba(255, 255, 255, .18);
+  --play-raised-soft-light: rgba(255, 255, 255, .055);
+  --play-raised-top-edge: rgba(255, 255, 255, .40);
+  --play-raised-inner-light: rgba(255, 255, 255, .14);
+  background:
+    linear-gradient(135deg, var(--play-raised-light), var(--play-raised-soft-light) 30%,
+      transparent 48%, rgba(0, 0, 0, .10) 74%, rgba(0, 0, 0, .18)),
+    var(--accent);
+  box-shadow:
+    inset 0 1px 0 var(--play-raised-top-edge),
+    inset 0 -1px 0 rgba(0, 0, 0, .26),
+    inset 2px 2px 4px var(--play-raised-inner-light),
+    inset -2px -3px 6px rgba(0, 0, 0, .12),
+    0 2px 2px -1px rgba(0, 0, 0, .26),
+    0 4px 6px -2px rgba(0, 0, 0, .20);
+  transition: filter .12s, box-shadow .12s;
+}
+:root[data-theme="light"] .player button.primary-control {
+  /* Preserve white-icon contrast on the existing darker light-theme accent. */
+  --play-raised-light: rgba(255, 255, 255, .075);
+  --play-raised-soft-light: rgba(255, 255, 255, .025);
+  --play-raised-top-edge: rgba(255, 255, 255, .22);
+  --play-raised-inner-light: rgba(255, 255, 255, .055);
+}
+:root .player button.primary-control:hover:not(:disabled) {
+  filter: brightness(1.04);
+  transform: none;
+}
+:root .player button.primary-control:active:not(:disabled) {
+  /* Invert the light direction and shorten contact shadows; no movement or scaling. */
+  background:
+    linear-gradient(135deg, rgba(0, 0, 0, .12), rgba(0, 0, 0, .025) 48%, rgba(255, 255, 255, .04)),
+    var(--accent);
+  box-shadow:
+    inset 1px 2px 4px rgba(0, 0, 0, .25),
+    inset -1px -1px 2px rgba(255, 255, 255, .10),
+    0 1px 2px -1px rgba(0, 0, 0, .20);
+  filter: brightness(.985);
+  transform: none;
+}
+:root .player button.primary-control:disabled {
+  box-shadow: none;
+  filter: none;
+}
+:root .player[data-visual-effects="false"] button.primary-control,
+:root .player[data-visual-effects="false"] button.primary-control:active {
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root .player button.primary-control { transition: none; }
+}

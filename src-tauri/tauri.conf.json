@@ -1,0 +1,92 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "PLIX",
+  "version": "0.1.0",
+  "identifier": "com.ympleer.v2",
+  "bundle": {
+    "publisher": "PLIX",
+    "windows": {
+      "wix": {
+        "upgradeCode": "d5f92054-f3af-5bec-8ff0-2ea910ae4b29"
+      }
+    },
+    "icon": [
+      "icons/16x16.png",
+      "icons/24x24.png",
+      "icons/32x32.png",
+      "icons/48x48.png",
+      "icons/64x64.png",
+      "icons/128x128.png",
+      "icons/256x256.png",
+      "icons/512x512.png",
+      "icons/icon.png",
+      "icons/icon.ico"
+    ]
+  },
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "PLIX",
+        "width": 440,
+        "height": 164,
+        "decorations": false,
+        "shadow": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "resizable": false
+      },
+      {
+        "label": "appearance",
+        "title": "Внешний вид",
+        "backgroundColor": "#1c2027",
+        "url": "index.html?window=appearance",
+        "width": 392,
+        "height": 437,
+        "decorations": false,
+        "shadow": false,
+        "transparent": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "visible": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "capabilities": [
+        {
+          "identifier": "appearance-content-size",
+          "windows": ["appearance"],
+          "permissions": [
+            "core:window:allow-inner-size",
+            "core:window:allow-outer-position",
+            "core:window:allow-current-monitor",
+            "core:window:allow-set-size",
+            "core:window:allow-set-position"
+          ]
+        },
+        {
+          "identifier": "main-drag",
+          "windows": [
+            "main",
+            "appearance"
+          ],
+          "permissions": [
+            "core:window:allow-start-dragging",
+            "core:event:allow-listen",
+            "core:event:allow-unlisten",
+            "core:window:allow-close"
+          ]
+        }
+      ]
+    }
+  }
+}

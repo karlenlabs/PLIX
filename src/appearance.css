@@ -1,0 +1,37 @@
+/* Appearance-only spacing; keep the shared type, controls and player materials. */
+:root .appearance {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px;
+}
+:root .appearance > * { flex-shrink: 0; }
+:root .appearance h1 { overflow: visible; }
+:root .appearance .appearance-header { margin-bottom: 8px; }
+:root .appearance .theme-field { padding-bottom: 8px; }
+:root .appearance .theme-field legend { margin-bottom: 6px; }
+:root .appearance :is(.always-on-top-field, .effects-field, .ambient-haze-field, .hybrid-palette-field) { padding: 8px 0; }
+:root .appearance .appearance-copy { gap: 2px; }
+:root .appearance .visualization-field { gap: 6px; padding-top: 8px; }
+:root .appearance .visualization-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  grid-area: 2 / 1;
+  padding-right: 34px;
+}
+/* The select and chevron share a grid cell, keeping both vertically centered. */
+:root .appearance .visualization-field::after {
+  content: "";
+  grid-area: 2 / 1;
+  align-self: center;
+  justify-self: end;
+  width: 6px;
+  height: 6px;
+  margin-right: 14px;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-2px) rotate(45deg);
+  pointer-events: none;
+}
+:root .appearance .visualization-field:has(select:disabled)::after { opacity: .45; }
+:root .appearance .ambient-haze-field { margin-top: 8px; }
+:root .appearance .appearance-message:empty { min-height: 0; margin-top: 0; }

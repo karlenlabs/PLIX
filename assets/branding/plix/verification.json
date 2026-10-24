@@ -1,0 +1,131 @@
+{
+  "source_sha256": "6c0fdd77c7e5cc07154357a7b3d23eee903b3534ed0bd59d7d21efad841efb24",
+  "source_size": [
+    1254,
+    1254
+  ],
+  "method": "Original RGB; scanline silhouette extraction; 1px edge unmatting; premultiplied-alpha Lanczos",
+  "small_size_variant": "Same approved art; no alternate letter or sharpening",
+  "source_tile_bbox": [
+    89,
+    86,
+    1165,
+    1157
+  ],
+  "square_crop": [
+    81,
+    75,
+    1092
+  ],
+  "unchanged_opaque_source_pixels": 1098593,
+  "boundary_matting_pixels": 8576,
+  "ico_frames": [
+    {
+      "size": 16,
+      "bytes": 1128,
+      "encoding": "DIB32"
+    },
+    {
+      "size": 24,
+      "bytes": 2440,
+      "encoding": "DIB32"
+    },
+    {
+      "size": 32,
+      "bytes": 4264,
+      "encoding": "DIB32"
+    },
+    {
+      "size": 48,
+      "bytes": 9640,
+      "encoding": "DIB32"
+    },
+    {
+      "size": 64,
+      "bytes": 16936,
+      "encoding": "DIB32"
+    },
+    {
+      "size": 128,
+      "bytes": 67624,
+      "encoding": "DIB32"
+    },
+    {
+      "size": 256,
+      "bytes": 75719,
+      "encoding": "PNG"
+    }
+  ],
+  "png_checks": [
+    {
+      "size": 16,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_corners": true,
+      "pale_backdrop_pixels": 0,
+      "P_to_Play_mean_RGB_difference": 67.0
+    },
+    {
+      "size": 24,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_corners": true,
+      "pale_backdrop_pixels": 0,
+      "P_to_Play_mean_RGB_difference": 72.33
+    },
+    {
+      "size": 32,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_corners": true,
+      "pale_backdrop_pixels": 0,
+      "P_to_Play_mean_RGB_difference": 111.0
+    },
+    {
+      "size": 48,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_corners": true,
+      "pale_backdrop_pixels": 0,
+      "P_to_Play_mean_RGB_difference": 101.0
+    },
+    {
+      "size": 64,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_corners": true,
+      "pale_backdrop_pixels": 0,
+      "P_to_Play_mean_RGB_difference": 102.67
+    },
+    {
+      "size": 128,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_corners": true,
+      "pale_backdrop_pixels": 0,
+      "P_to_Play_mean_RGB_difference": 104.33
+    },
+    {
+      "size": 256,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_corners": true,
+      "pale_backdrop_pixels": 0,
+      "P_to_Play_mean_RGB_difference": 104.67
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+/* Artwork haze: same z-plane as the canvas, below artwork/content (z=1).
+   The content-side mask limits the haze to 3.6% opacity even at full intensity. */
+:root .player > .ambient-haze {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  contain: paint;
+  pointer-events: none;
+  opacity: var(--ambient-haze-opacity, 0);
+  mix-blend-mode: normal;
+  background:
+    radial-gradient(ellipse 115% 150% at 12% 35%, color-mix(in srgb, var(--ambient-1) 75%, transparent), transparent 85%),
+    radial-gradient(ellipse 100% 180% at 85% 85%, color-mix(in srgb, var(--ambient-2) 65%, transparent), transparent 90%),
+    radial-gradient(ellipse 160% 150% at 55% 100%, color-mix(in srgb, var(--ambient-3) 65%, transparent), transparent 95%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 24%, rgba(0, 0, 0, .12) 34%, rgba(0, 0, 0, .12) 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 24%, rgba(0, 0, 0, .12) 34%, rgba(0, 0, 0, .12) 100%);
+}
+:root .player[data-visual-effects="true"] > .ambient-haze { display: block; }

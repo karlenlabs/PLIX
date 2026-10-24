@@ -1,0 +1,175 @@
+/* Warm Cream: the production Light material. Geometry, typography, SVGs and interaction remain inherited; the final surface fill is opaque. */
+:root[data-theme="light"] .player[data-player-design] {
+  --text: #40352e;
+  --muted: #705d50;
+  --tertiary: #705d50;
+  --control: #786758;
+  --surface: 243, 231, 218;
+  --player-surface: 243, 231, 218;
+  --primary-text: #40352e;
+  --accent: #ac7d47;
+  --range-fill: #ac7d47;
+  --track: #f8eddf;
+  --thumb: #ac7d47;
+  --hover: rgba(133, 101, 74, .09);
+  --focus: #846044;
+  --artwork: #eadacb;
+  --placeholder: linear-gradient(145deg, #f3e7da, #e1cdb9);
+  --placeholder-icon: #8b7768;
+  color: var(--text);
+  opacity: 1;
+  border-color: #c5a888;
+  /* Opaque lighting maps blend only with this opaque material, never the desktop. */
+  background: radial-gradient(ellipse 78% 140% at 28% -12%, #ffffff 0%, #fdfdfd 36%, #fafafa 100%),
+    radial-gradient(ellipse 65% 125% at 86% 18%, #ffffff 0%, #fcfcfc 100%),
+    linear-gradient(180deg, #fffaf3 0%, #f7ecdf 46%, #f3e7da 100%), #f3e7da;
+  background-blend-mode: multiply, multiply, normal;
+  box-shadow:
+    inset 0 1px 0 #fffdf8,
+    inset 1px 0 0 rgba(255, 250, 242, .65),
+    inset 0 10px 14px -12px rgba(255, 255, 255, .9),
+    inset 0 -1px 0 rgba(131, 95, 65, .32),
+    inset 0 -3px 2px -2px rgba(142, 104, 72, .3),
+    inset 0 -10px 12px -12px rgba(130, 93, 62, .26),
+    0 2px 2px -1px rgba(81, 59, 41, .22),
+    0 4px 4px -3px rgba(81, 59, 41, .18);
+}
+:root[data-theme="light"] .player :is(h1, p, .times, .volume-percent) {
+  text-shadow: none;
+}
+:root[data-theme="light"] .player .volume-percent,
+:root[data-theme="light"] .player .appearance-button { opacity: 1; }
+:root[data-theme="light"] .player .controls button:not(.primary-control),
+:root[data-theme="light"] .player .volume .mute-button,
+:root[data-theme="light"] .player .appearance-button {
+  color: var(--control);
+  background: transparent;
+}
+:root[data-theme="light"] .player .controls button:not(.primary-control):hover:not(:disabled),
+:root[data-theme="light"] .player .volume .mute-button:hover:not(:disabled),
+:root[data-theme="light"] .player .appearance-button:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--hover);
+}
+:root[data-theme="light"] .player .controls button:not(.primary-control):active:not(:disabled),
+:root[data-theme="light"] .player .volume .mute-button:active:not(:disabled),
+:root[data-theme="light"] .player .appearance-button:active:not(:disabled) {
+  background: rgba(133, 101, 74, .15);
+}
+:root[data-theme="light"] .player button.primary-control {
+  --primary-text: #56412d;
+  color: var(--primary-text);
+  background: radial-gradient(ellipse 88% 72% at 29% 16%, rgba(255, 252, 241, .38), rgba(255, 252, 241, 0) 78%),
+    radial-gradient(ellipse 78% 82% at 56% 56%, rgba(255, 248, 232, .2), rgba(255, 248, 232, 0) 82%),
+    linear-gradient(140deg, #fbf3e5 0%, #f7ecdc 35%, #f2e3cf 72%, #f6e9d6 100%);
+  box-shadow:
+    inset 2px 2px 5px rgba(255, 247, 230, .45),
+    inset -2px -1px 5px rgba(173, 132, 81, .08),
+    -1px 2px 3px -1px rgba(111, 80, 45, .18),
+    -2px 3px 5px -3px rgba(111, 80, 45, .12),
+    1px 0 5px rgba(255, 234, 196, .26),
+    0 0 4px 1px rgba(255, 244, 215, .24);
+  --cream-rim-light: 255, 253, 241;
+  --cream-rim-lower: 255, 249, 231;
+  --cream-rim-state: 1;
+  --cream-rim-gold-opacity: .57;
+  position: relative;
+}
+:root[data-theme="light"] .player button.primary-control:hover:not(:disabled) {
+  filter: none;
+  box-shadow: inset 2px 2px 5px rgba(255, 247, 230, .5),
+    inset -2px -1px 5px rgba(173, 132, 81, .08),
+    -1px 2px 3px -1px rgba(111, 80, 45, .18),
+    -2px 3px 5px -3px rgba(111, 80, 45, .12),
+    1px 0 6px rgba(255, 234, 196, .3),
+    0 0 4px 1px rgba(255, 244, 215, .28);
+  --cream-rim-light: 255, 254, 245;
+  --cream-rim-lower: 255, 251, 236;
+  --cream-rim-state: 1;
+  --cream-rim-gold-opacity: .63;
+}
+:root[data-theme="light"] .player button.primary-control:active:not(:disabled) {
+  background: radial-gradient(ellipse 88% 72% at 33% 20%, rgba(255, 252, 241, .26), rgba(255, 252, 241, 0) 78%),
+    linear-gradient(140deg, #f8eddf 0%, #f5e8d6 44%, #f2e2cd 76%, #f3e5d1 100%);
+  box-shadow: inset 1px 1px 3px rgba(150, 111, 64, .09),
+    inset -1px -1px 3px rgba(255, 249, 235, .38),
+    -1px 1px 2px -1px rgba(111, 80, 45, .16),
+    0 0 4px rgba(255, 240, 207, .2);
+  filter: none;
+  --cream-rim-light: 255, 253, 241;
+  --cream-rim-lower: 255, 249, 231;
+  --cream-rim-state: .84;
+  --cream-rim-gold-opacity: .52;
+}
+:root[data-theme="light"] .player button:disabled {
+  opacity: var(--muted-control-opacity);
+}
+/* Independent internal masks feather both rims inward; angular fading keeps gold off the left arc. */
+:root[data-theme="light"] .player button.primary-control::before,
+:root[data-theme="light"] .player button.primary-control::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+:root[data-theme="light"] .player button.primary-control::before {
+  background: conic-gradient(from 0deg,
+    rgba(var(--cream-rim-light), .8) 0deg,
+    rgba(var(--cream-rim-light), .35) 30deg,
+    transparent 65deg, transparent 115deg,
+    rgba(var(--cream-rim-lower), .6) 145deg,
+    rgb(var(--cream-rim-lower)) 185deg,
+    rgb(var(--cream-rim-light)) 270deg,
+    rgb(var(--cream-rim-light)) 330deg,
+    rgba(var(--cream-rim-light), .8) 360deg);
+  -webkit-mask-image: radial-gradient(closest-side, transparent calc(100% - 3.5px), #000 calc(100% - .65px));
+  mask-image: radial-gradient(closest-side, transparent calc(100% - 3.5px), #000 calc(100% - .65px));
+  opacity: calc(0.5 * var(--cream-rim-state));
+}
+:root[data-theme="light"] .player button.primary-control::after {
+  background: conic-gradient(from 0deg,
+    rgba(196, 157, 105, .18) 0deg,
+    rgba(177, 128, 68, .4) 45deg,
+    rgba(154, 105, 51, var(--cream-rim-gold-opacity)) 90deg,
+    rgba(188, 139, 79, .35) 138deg,
+    rgba(223, 193, 149, .2) 168deg,
+    rgba(223, 193, 149, .1) 190deg,
+    transparent 225deg, transparent 320deg,
+    rgba(196, 157, 105, .18) 360deg);
+  -webkit-mask-image: radial-gradient(closest-side, transparent calc(100% - 3.5px), #000 calc(100% - .45px));
+  mask-image: radial-gradient(closest-side, transparent calc(100% - 3.5px), #000 calc(100% - .45px));
+  opacity: 1;
+}
+:root[data-theme="light"] .player button.primary-control:disabled::before,
+:root[data-theme="light"] .player button.primary-control:disabled::after { content: none; }
+:root[data-theme="light"] .player button.primary-control:disabled {
+  box-shadow: inset 0 0 0 .75px rgba(171, 128, 76, .3), inset 0 0 0 1.6px rgba(255, 253, 247, .7);
+  filter: none;
+}
+:root[data-theme="light"] .player :is(button, input):focus-visible {
+  outline-color: var(--focus);
+}
+:root[data-theme="light"] .player input[type="range"]::-webkit-slider-runnable-track {
+  box-shadow: inset 0 1px 1px rgba(111, 83, 60, .12), 0 1px 0 rgba(255, 252, 245, .65);
+}
+:root[data-theme="light"] .player input[type="range"]::-webkit-slider-thumb {
+  background: var(--thumb);
+  box-shadow: inset 0 1px 0 rgba(255, 243, 218, .65), inset 0 -1px 0 rgba(114, 75, 37, .22), 0 1px 2px rgba(90, 61, 39, .26);
+}
+:root[data-theme="light"] .player input[type="range"]:hover:not(:disabled)::-webkit-slider-thumb,
+:root[data-theme="light"] .player input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: inset 0 1px 0 rgba(255, 243, 218, .75), inset 0 -1px 0 rgba(114, 75, 37, .22), 0 1px 2px rgba(90, 61, 39, .26), 0 0 0 1px #e2c7a7;
+}
+:root[data-theme="light"] .player input[type="range"]::-moz-range-thumb {
+  background: var(--thumb);
+  box-shadow: inset 0 1px 0 rgba(255, 243, 218, .65), inset 0 -1px 0 rgba(114, 75, 37, .22), 0 1px 2px rgba(90, 61, 39, .26);
+}
+:root[data-theme="light"] .player .artwork {
+  box-shadow: 0 1px 3px rgba(84, 61, 43, .12), 0 3px 4px -2px rgba(84, 61, 43, .12);
+}
+:root[data-theme="light"] .player .artwork::after {
+  box-shadow: none;
+}
+:root[data-theme="light"] .player .artwork img { filter: none; }
+:root[data-theme="light"] .player .volume input[type="range"]:not(:disabled) { opacity: 1; }

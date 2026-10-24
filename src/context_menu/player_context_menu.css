@@ -1,0 +1,31 @@
+/* DEV only; opaque surfaces, scoped outside the player's stacking context. */
+[data-plix-dev-menu-layer] { position: fixed; inset: 0; z-index: 10000; background: transparent; }
+[data-plix-dev-menu] {
+  --menu-text: #f2f3f5; --menu-hover: #303641; --menu-active: #384253;
+  --menu-focus: #aec4ed; --menu-danger: #f08b8b; --menu-danger-hover: #3e292f; --menu-danger-active: #4b2b32;
+  box-sizing: border-box; position: fixed; width: 210px; padding: 4px;
+  border: 1px solid #353a44; border-radius: 10px; color: var(--menu-text); background: #1c2027;
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif; font-size: 13px; line-height: 18px;
+  user-select: none; color-scheme: dark;
+}
+[data-plix-dev-menu] button {
+  appearance: none; box-sizing: border-box; display: grid; grid-template-columns: 16px 1fr 16px; align-items: center; gap: 8px;
+  width: 100%; height: 32px; margin: 0; padding: 0 8px; border: 0; border-radius: 6px;
+  font: inherit; font-weight: 400; text-align: left; white-space: nowrap; cursor: pointer;
+  color: var(--menu-text); background: transparent; opacity: 1; transform: none;
+}
+[data-plix-dev-menu] svg { display: block; width: 16px; height: 16px; pointer-events: none; }
+[data-plix-dev-menu] button:hover { color: var(--menu-text); background: var(--menu-hover); }
+[data-plix-dev-menu] button:active { color: var(--menu-text); background: var(--menu-active); transform: none; }
+[data-plix-dev-menu] button:focus-visible { outline: 2px solid var(--menu-focus); outline-offset: -2px; background: var(--menu-hover); }
+[data-plix-dev-menu] [role="separator"] { height: 1px; margin: 4px 6px; background: #353a44; }
+[data-plix-dev-menu] button[data-action="quit"] { color: var(--menu-danger); }
+[data-plix-dev-menu] button[data-action="quit"]:hover,
+[data-plix-dev-menu] button[data-action="quit"]:focus-visible { color: var(--menu-danger); background: var(--menu-danger-hover); }
+[data-plix-dev-menu] button[data-action="quit"]:active { color: var(--menu-danger); background: var(--menu-danger-active); }
+:root[data-theme="light"] [data-plix-dev-menu] {
+  --menu-text: #40352e; --menu-hover: #e8daca; --menu-active: #ddcbb6; --menu-focus: #846044;
+  --menu-danger: #ac3035; --menu-danger-hover: #efd7ce; --menu-danger-active: #e8c7be;
+  background: #f3e7da; border-color: #c5a888; color-scheme: light;
+}
+:root[data-theme="light"] [data-plix-dev-menu] [role="separator"] { background: #c5a888; }

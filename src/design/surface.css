@@ -1,0 +1,35 @@
+/* Shared approved surface rendering. The 1px layout border stays intact;
+   extra border width is painted inward. */
+:root .player[data-player-design] {
+  border-color: rgba(var(--design-border-rgb), var(--design-border-alpha));
+  background:
+    linear-gradient(135deg, rgba(var(--player-highlight), var(--design-veil)), transparent 60%),
+    linear-gradient(hsl(from var(--design-base-color) h calc(s * var(--surface-saturation)) calc(l * var(--surface-brightness)) / var(--design-base-opacity)), hsl(from var(--design-base-color) h calc(s * var(--surface-saturation)) calc(l * var(--surface-brightness)) / var(--design-base-opacity))),
+    rgb(var(--surface));
+  box-shadow:
+    inset 0 0 0 var(--design-border-width) rgba(var(--design-border-rgb), var(--design-border-alpha)),
+    inset 0 1px 0 rgba(var(--player-highlight), calc(var(--top-edge-highlight-opacity) * var(--design-top-line))),
+    inset 0 10px 18px -18px rgba(var(--player-highlight), calc(var(--top-edge-soft-highlight-opacity) * var(--design-top-soft))),
+    inset 0 -1px 0 rgba(0, 0, 0, calc(.06 * var(--design-bottom-shade))),
+    inset 1px 0 0 rgba(var(--player-highlight), calc(var(--left-edge-highlight-opacity) * var(--design-edge))),
+    var(--shadow-offset-x) var(--shadow-offset-y) var(--shadow-blur) var(--shadow-spread) rgba(0, 0, 0, var(--design-shadow));
+}
+:root[data-theme="light"] .player[data-player-design] {
+  box-shadow:
+    inset 0 0 0 var(--design-border-width) rgba(var(--design-border-rgb), var(--design-border-alpha)),
+    inset 0 1px 0 rgba(var(--player-highlight), calc(var(--top-edge-highlight-opacity) * var(--design-top-line))),
+    inset 0 10px 18px -18px rgba(var(--player-highlight), calc(var(--top-edge-soft-highlight-opacity) * var(--design-top-soft))),
+    inset 0 -1px 0 rgba(25, 27, 32, calc(.04 * var(--design-bottom-shade))),
+    inset 1px 0 0 rgba(var(--player-highlight), calc(var(--left-edge-highlight-opacity) * var(--design-edge))),
+    var(--shadow-offset-x) var(--shadow-offset-y) var(--shadow-blur) var(--shadow-spread) rgba(0, 0, 0, var(--design-shadow));
+}
+:root .player[data-player-design]::before { opacity: calc(var(--ambient-opacity) * var(--design-ambient)); }
+:root .player[data-player-design]::after {
+  background:
+    radial-gradient(ellipse at 8% 25%, color-mix(in srgb, var(--ambient-color-1) clamp(0%, calc(9% * var(--ambient-left-intensity) * var(--design-wash)), 100%), transparent), transparent 70%),
+    radial-gradient(ellipse at 90% 20%, color-mix(in srgb, var(--ambient-color-2) clamp(0%, calc(8% * var(--ambient-top-right-intensity) * var(--design-wash)), 100%), transparent), transparent 70%),
+    radial-gradient(ellipse at 55% 100%, color-mix(in srgb, var(--ambient-color-3) clamp(0%, calc(7% * var(--ambient-bottom-center-intensity) * var(--design-wash)), 100%), transparent), transparent 75%);
+  box-shadow:
+    inset 0 -1px 0 color-mix(in srgb, var(--ambient-color-1) calc(var(--bottom-edge-glow-opacity) * var(--design-edge) * 100%), transparent),
+    inset 0 -12px 24px -20px color-mix(in srgb, var(--ambient-color-1) calc(var(--bottom-edge-soft-glow-opacity) * var(--design-edge) * 100%), transparent);
+}

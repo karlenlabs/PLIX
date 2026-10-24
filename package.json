@@ -1,0 +1,26 @@
+{
+  "name": "ympleer-v2",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri",
+    "dev:tuning": "node scripts/dev-tuning.mjs"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.11.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "pixi.js": "8.17.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.1.0"
+  }
+}
