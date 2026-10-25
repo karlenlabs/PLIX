@@ -82,6 +82,7 @@ temp/
 /*-REPORT.md
 /FINAL-AUDIT.md
 /visual-design-*.provenance.json
+/assets/branding/plix/verification.json
 
 # Python helper caches
 __pycache__/
