@@ -1,96 +1,96 @@
 # PLIX
 
-PLIX is a compact desktop mini-player for Yandex Music on Windows.
-Built with React, Vite, Tauri 2 and Rust, it controls playback through the Windows system media session.
+PLIX — компактный настольный мини-плеер для Яндекс Музыки в Windows.
+Приложение создано на React, Vite, Tauri 2 и Rust и управляет воспроизведением через системную медиасессию Windows.
 
-![PLIX mini-player for Yandex Music on Windows](assets/readme/plix-hero.jpg)
+![Мини-плеер PLIX для Яндекс Музыки в Windows](assets/readme/plix-hero.jpg)
 
-## Features
+## Возможности
 
-- Compact mini-player for Windows.
-- Yandex Music playback controls: play, pause, previous and next track.
-- Track artwork, title, playback progress and seeking.
-- Volume control and mute for the Yandex Music app.
-- Light and dark themes.
-- Visual effects and FFT-based audio-reactive visualization.
-- Hybrid Palette: colors adapt to artwork and music.
-- Tray integration and context menu.
-- Always on top.
-- Saved appearance settings.
+- Компактный мини-плеер для Windows.
+- Управление воспроизведением Яндекс Музыки: воспроизведение, пауза, предыдущий и следующий трек.
+- Обложка, название трека, прогресс воспроизведения и перемотка.
+- Управление громкостью и отключение звука приложения Яндекс Музыки.
+- Светлая и тёмная темы.
+- Визуальные эффекты и реагирующая на звук визуализация на основе FFT.
+- Hybrid Palette: цвета адаптируются к обложке и музыке.
+- Интеграция с системным треем и контекстное меню.
+- Always on top — закрепление поверх других окон.
+- Сохранение настроек оформления.
 
-The Yandex Music desktop app must be running separately. Available playback
-commands depend on its active media session. Audio capture for visualization
-requires Windows process-loopback support.
+Настольное приложение Яндекс Музыки должно быть запущено отдельно. Доступные команды
+управления воспроизведением зависят от его активной медиасессии. Для захвата звука
+для визуализации требуется поддержка process-loopback в Windows.
 
-## Requirements
+## Требования
 
-- Windows 11 is the primary target platform.
-- Yandex Music desktop app and Microsoft Edge WebView2 Runtime.
-- Node.js 20.19+ or 22.12+ with npm, compatible with Vite 7.
-- Rust with the MSVC toolchain, Visual Studio Build Tools with C++ and the Windows SDK.
+- Windows 11 — основная целевая платформа.
+- Настольное приложение Яндекс Музыки и Microsoft Edge WebView2 Runtime.
+- Node.js 20.19+ или 22.12+ с npm, совместимый с Vite 7.
+- Rust с набором инструментов MSVC, Visual Studio Build Tools с C++ и Windows SDK.
 
-Run all commands below from the project root.
+Все команды ниже выполняются из корня проекта.
 
-## Installation / Run
+## Установка / Запуск
 
 ```powershell
 npm ci
 npm run tauri -- dev
 ```
 
-Use `npm run dev` to run the frontend in a browser. Native media commands
-require the Tauri app. You can also use `start-dev.bat`, which launches the app
-from the directory containing the BAT file.
+Для запуска фронтенда в браузере используйте `npm run dev`. Нативные медиакоманды
+требуют запуска приложения через Tauri. Также можно использовать `start-dev.bat`,
+который запускает приложение из каталога, содержащего BAT-файл.
 
-## Verification / Build
+## Проверка / Сборка
 
 ```powershell
 npm run build
 cargo check --manifest-path src-tauri/Cargo.toml --locked
 ```
 
-The first command builds the production frontend in `dist/`; the second checks
-the Rust code. These commands do not produce a release EXE. Build the production
-desktop executable with the Tauri CLI, which enables the production protocol
-and embeds the frontend:
+Первая команда собирает фронтенд для выпуска в `dist/`; вторая проверяет
+Rust-код. Эти команды не создают релизный EXE-файл. Для сборки релизного
+исполняемого файла настольного приложения используйте Tauri CLI, который включает
+production protocol и встраивает фронтенд:
 
 ```powershell
 npm run tauri -- build --no-bundle --features tauri/custom-protocol
 ```
 
-Always use the Tauri CLI for release builds. A plain `cargo build --release`
-does not replace this step; `src-tauri/build.rs` enforces the production protocol
-requirement.
+Для релизных сборок всегда используйте Tauri CLI. Обычный `cargo build --release`
+не заменяет этот шаг; `src-tauri/build.rs` проверяет обязательное включение
+production protocol.
 
-## DEV tools
+## DEV-инструменты
 
-`npm run dev:tuning` launches the development player and the Visual Tuning panel
-for adjusting surfaces, colors and visual layer diagnostics. Diagnostic modes
-are available in development builds.
+`npm run dev:tuning` запускает плеер в режиме разработки и панель Visual Tuning
+для настройки поверхностей, цветов и диагностики визуальных слоёв. Диагностические
+режимы доступны в сборках для разработки.
 
-The full `src/dev/` directory is required: its validators are also used by the
-development bridge in the Vite configuration. Production palette algorithms
-live in `src/palette/`, and appearance code lives in `src/design/`. Saved
-development settings are stored in the browser's local storage.
+Каталог `src/dev/` необходим целиком: его валидаторы также используются
+DEV-мостом в конфигурации Vite. Алгоритмы палитры, используемые в релизной версии,
+находятся в `src/palette/`, а код оформления — в `src/design/`. Сохранённые
+настройки режима разработки хранятся в локальном хранилище браузера.
 
-## Structure
+## Структура
 
-- `src/` — UI, appearance, visualization and development tools.
-- `src-tauri/` — Windows integration, audio, settings storage and app resources.
-- `scripts/` — development panel launcher, icon preparation and explicit settings recovery.
-- `assets/branding/plix/` — branding source images and previews.
-- `assets/readme/` — screenshots for this README.
-- [Context menu](CONTEXT-MENU.md) — behavior and keyboard controls.
+- `src/` — интерфейс, оформление, визуализация и инструменты разработки.
+- `src-tauri/` — интеграция с Windows, аудио, хранение настроек и ресурсы приложения.
+- `scripts/` — запуск панели разработки, подготовка иконок и восстановление настроек по явной команде.
+- `assets/branding/plix/` — исходные изображения и превью брендинга.
+- `assets/readme/` — скриншоты для этого README.
+- [Контекстное меню](CONTEXT-MENU.md) — поведение и управление с клавиатуры.
 
-Dependencies are pinned in `package-lock.json` and `src-tauri/Cargo.lock`.
-Legacy Ympleer configuration identifiers are retained for settings and Windows
-integration compatibility. Historical test suites, prototypes, local data and
-build outputs are excluded from this public repository.
+Зависимости зафиксированы в `package-lock.json` и `src-tauri/Cargo.lock`.
+Прежние конфигурационные идентификаторы Ympleer сохранены для совместимости
+настроек и интеграции с Windows. Исторические тестовые наборы, прототипы, локальные
+данные и результаты сборки исключены из этого публичного репозитория.
 
-## Third-party code
+## Сторонний код
 
-- Lucide: [ISC license](src/context_menu/context-menu-icons/LICENSE).
-- Local Windows adaptation of the Tauri single-instance plugin:
-  [MIT license](src-tauri/vendor/tauri-plugin-single-instance/LICENSE-MIT)
-  and [upstream notes](src-tauri/vendor/tauri-plugin-single-instance/UPSTREAM.md).
-- npm and Cargo dependencies retain their respective licenses.
+- Lucide: [лицензия ISC](src/context_menu/context-menu-icons/LICENSE).
+- Локальная адаптация плагина Tauri single-instance для Windows:
+  [лицензия MIT](src-tauri/vendor/tauri-plugin-single-instance/LICENSE-MIT)
+  и [сведения об исходном проекте](src-tauri/vendor/tauri-plugin-single-instance/UPSTREAM.md).
+- Зависимости npm и Cargo сохраняют собственные лицензии.
