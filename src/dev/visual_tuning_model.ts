@@ -32,6 +32,10 @@ export const sections = {
     ["--control-background-opacity", "Control background opacity", 0, 1, .01, ""],
     ["--muted-control-opacity", "Muted / disabled opacity", 0, 1, .01, ""],
   ],
+  Blobs: [
+    ["--visualizer-opacity", "Blob opacity", 0, 1, .01, ""],
+    ["--visualizer-brightness", "Blob brightness", .2, 2, .01, ""],
+  ],
   Shadow: [
     ["--shadow-opacity", "Opacity", 0, 1, .01, ""],
     ["--shadow-blur", "Blur", 0, 40, 1, "px"],
@@ -54,9 +58,11 @@ export type Preset = Record<Variable, number>;
 export type PlayerSnapshot = { values: Preset; defaults: Preset; theme: string; commandId: string | null; design?: DesignSnapshot };
 export const storageKey = "ympleer-v2:dev:visual-tuning:v1";
 
+// Variables added after presets were first saved; older presets get these defaults.
+const addedDefaults: Readonly<Record<string, number>> = { "--visualizer-opacity": 1, "--visualizer-brightness": 1 };
 export function validatePreset(input: unknown): Preset {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Invalid preset");
-  const record = input as Record<string, unknown>;
+  const record = { ...addedDefaults, ...(input as Record<string, unknown>) };
   const result = {} as Preset;
   for (const [name, , min, max] of parameters) {
     const value = record[name];

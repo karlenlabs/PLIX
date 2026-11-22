@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { AppearanceWindow, startWindowDrag, useAppearance } from "./appearance";
 import { showPlayerContextMenu } from "./player_context_menu";
 import { canTransport, clampSeek, createMediaPoll, type TransportCommand } from "./media_sync";
@@ -10,12 +11,19 @@ import { createAmbientHaze } from "./ambient_haze";
 import "./design/ambient_haze.css";
 import "./style.css";
 import { productionStyle } from "./design/runtime";
+import { playerBackgroundColor } from "./player_background";
 import "./design/surface.css";
 import "./design/effects.css";
 import "./design/play_pause.css";
 import "./design/warm_cream.css";
 
+type SourceView = { mode: "desktop" | "browser"; revision: string; selectedId: string | null };
+type MediaSnapshot = { source: SourceView; media: MediaState | null };
 type MediaState = {
+  selectionRevision: string;
+  album: string | null;
+  subtitle: string | null;
+  playbackRate: number | null;
   sourceId: string;
   title: string | null;
   artist: string | null;
@@ -53,10 +61,10 @@ function Icon({ name }: { name: "previous" | "next" | "play" | "pause" | "music"
   );
 }
 
-type AudioVolume = { sessionId: string; level: number; muted: boolean };
-type MuteTarget = { sessionId: string; muted: boolean };
+type AudioVolume = { sourceRevision: string; sessionId: string; level: number; muted: boolean };
+type MuteTarget = { sourceRevision: string; sessionId: string; muted: boolean };
 
-function VolumeControl() {
+function VolumeControl({ enabled }: { enabled: boolean }) {
   const [volume, setVolume] = useState<AudioVolume | null>(null);
   const [error, setError] = useState("");
   const [muteBusy, setMuteBusy] = useState(false);
@@ -67,6 +75,11 @@ function VolumeControl() {
   const slider = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      setVolume(null);
+      setError("Громкость и mute отключены для Browser");
+      return;
+    }
     let active = true;
     let current: AudioVolume | null = null;
     let pending: AudioVolume | null = null;
@@ -126,7 +139,7 @@ function VolumeControl() {
         const result = muteTarget
           ? await invoke<AudioVolume | null>("set_mute", muteTarget)
           : await invoke<AudioVolume | null>("set_volume", {
-            sessionId: volumeTarget!.sessionId, level: volumeTarget!.level,
+            sessionId: volumeTarget!.sessionId, sourceRevision: volumeTarget!.sourceRevision, level: volumeTarget!.level,
           });
         if (!active) return;
         if (!result || result.sessionId !== target.sessionId) {
@@ -174,14 +187,14 @@ function VolumeControl() {
       // Ignore repeated input values; keep only the newest pending movement.
       if (Math.round((pending ?? inFlightTarget ?? current).level * 100) === Math.round(level * 100)) return;
       version++;
-      pending = { sessionId: current.sessionId, level, muted: current.muted };
+      pending = { sessionId: current.sessionId, sourceRevision: current.sourceRevision, level, muted: current.muted };
       setVolume(pending);
       scheduleWrite();
     };
     toggleMute.current = () => {
       if (!current || pendingMute || muting) return;
       version++;
-      pendingMute = { sessionId: current.sessionId, muted: !current.muted };
+      pendingMute = { sessionId: current.sessionId, sourceRevision: current.sourceRevision, muted: !current.muted };
       setMuteBusy(true);
       scheduleWrite();
     };
@@ -233,12 +246,12 @@ function VolumeControl() {
       finish.current = () => {};
       toggleMute.current = () => {};
     };
-  }, []);
+  }, [enabled]);
 
   const percent = volume ? Math.round(volume.level * 100) : null;
   return (
     <div className="volume" title={error || "Громкость Яндекс Музыки"}>
-      <button className="mute-button" type="button" disabled={!volume || muteBusy}
+      <button className="mute-button" type="button" disabled={!enabled || !volume || muteBusy}
         aria-label={volume?.muted ? "Включить звук Яндекс Музыки" : "Выключить звук Яндекс Музыки"}
         aria-pressed={volume?.muted ?? false}
         title={error || (volume?.muted ? "Включить звук" : "Выключить звук")}
@@ -251,7 +264,7 @@ function VolumeControl() {
       </button>
       <input ref={slider} type="range" aria-label="Громкость Яндекс Музыки"
         aria-valuetext={percent === null ? "Недоступна" : percent + "%"}
-        min={0} max={100} step={1} value={percent ?? 0} disabled={!volume}
+        min={0} max={100} step={1} value={percent ?? 0} disabled={!enabled || !volume}
         style={{ "--progress": (percent ?? 0) + "%" } as CSSProperties}
         onChange={event => change.current(Number(event.currentTarget.value))}
         onPointerDown={event => {
@@ -291,6 +304,8 @@ function App() {
     return () => { active = false; stop?.(); };
   }, []);
 
+  const [source, setSource] = useState<SourceView>({ mode: "desktop", revision: "1", selectedId: null });
+  const latestSource = useRef(source);
   const [media, setMedia] = useState<MediaState | null>(null);
   const [artwork, setArtwork] = useState<string | null>(null);
   const [artworkAccent, setArtworkAccent] = useState<{ source: string; palette: ArtworkPalette } | null>(null);
@@ -305,15 +320,30 @@ function App() {
   const seeking = useRef(false);
   const gestureTrack = useRef<string | null>(null);
   const transporting = useRef(false);
-  const polling = useRef<ReturnType<typeof createMediaPoll<MediaState | null>> | null>(null);
+  const polling = useRef<ReturnType<typeof createMediaPoll<MediaSnapshot>> | null>(null);
 
   useEffect(() => {
     let resetArtwork = true;
     let artworkTrack: string | null = null;
-    const poll = createMediaPoll<MediaState | null>({
+    let sourceRevision: string | null = null;
+    const poll = createMediaPoll<MediaSnapshot>({
       read: () => invoke("get_media_state", { resetArtwork }),
       discard: () => { resetArtwork = true; },
-      accept: state => {
+      accept: result => {
+        if (BigInt(result.source.revision) < BigInt(latestSource.current.revision)) {
+          resetArtwork = true;
+          return;
+        }
+        const state = result.media;
+        latestSource.current = result.source;
+        setSource(result.source);
+        if (sourceRevision !== result.source.revision) {
+          setArtwork(null);
+          scrubRef.current = null;
+          setScrub(null);
+          artworkTrack = null;
+        }
+        sourceRevision = result.source.revision;
         resetArtwork = false;
         if (!state || (state.trackKey !== null && artworkTrack !== state.trackKey)) {
           setArtwork(null);
@@ -352,7 +382,7 @@ function App() {
       const { media: current, at } = snapshot.current;
       const elapsed = current?.playbackState === "playing" ? performance.now() - at : 0;
       setPosition(current?.positionMs == null ? null :
-        Math.min(current.durationMs ?? Infinity, current.positionMs + elapsed));
+        Math.min(current.durationMs ?? Infinity, current.positionMs + elapsed * (current.playbackRate ?? 1)));
       frame = requestAnimationFrame(animate);
     }
     frame = requestAnimationFrame(animate);
@@ -362,6 +392,32 @@ function App() {
       clearInterval(timer);
       cancelAnimationFrame(frame);
     };
+  }, []);
+
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    let active = true;
+    let unlisten: (() => void) | undefined;
+    void listen<SourceView>("plix:media-source-changed", event => {
+      if (!active || BigInt(event.payload.revision) <= BigInt(latestSource.current.revision)) return;
+      latestSource.current = event.payload;
+      setSource(event.payload);
+      snapshot.current = { media: null, at: performance.now() };
+      setMedia(null);
+      setArtwork(null);
+      scrubRef.current = null;
+      setScrub(null);
+      void polling.current?.refresh();
+    }).then(stop => { if (active) unlisten = stop; else stop(); }).catch(cause => console.error("DEV source events", cause));
+    function openSources(event: KeyboardEvent) {
+      if (event.ctrlKey && event.shiftKey && event.code === "KeyB") {
+        event.preventDefault();
+        void invoke("dev_open_media_sources").catch(cause => setError(String(cause)));
+      }
+    }
+    window.addEventListener("keydown", openSources);
+    return () => { active = false; unlisten?.(); window.removeEventListener("keydown", openSources); };
   }, []);
 
   async function openYandexMusic() {
@@ -387,7 +443,7 @@ function App() {
     setBusy(true);
     setError("");
     try {
-      if (!await invoke<boolean>(command)) setError("Действие недоступно");
+      if (!await invoke<boolean>(command, { selectionRevision: snapshot.current.media?.selectionRevision })) setError("Действие недоступно");
     } catch (cause) {
       console.error(command, cause);
       setError("Не удалось выполнить действие");
@@ -423,7 +479,7 @@ function App() {
     setError("");
     try {
       const accepted = await invoke<boolean>("seek_to", {
-        positionMs: position, trackKey: target.trackKey,
+        positionMs: position, trackKey: target.trackKey, selectionRevision: current?.selectionRevision,
       });
       if (accepted && snapshot.current.media?.trackKey === target.trackKey) {
         snapshot.current = {
@@ -449,12 +505,15 @@ function App() {
   const progress = duration ? Math.min(100, Math.max(0, (displayed ?? 0) / duration * 100)) : 0;
   const playing = media?.playbackState === "playing";
   const palette = artworkAccent?.source === artwork ? artworkAccent.palette : NEUTRAL_PALETTE;
+  const backgroundMode = appearance.ready ? appearance.snapshot.settings.playerBackground ?? "classic" : "classic";
+  const background = playerBackgroundColor(backgroundMode, palette);
 
   return (
-    <main ref={player} className="player" data-player-design="true" data-visual-effects={appearance.ready && appearance.snapshot.settings.visualEffectsEnabled ? "true" : "false"} aria-label="PLIX" onMouseDown={startWindowDrag} onContextMenuCapture={showPlayerContextMenu}
+    <main ref={player} className="player" data-player-design="true" data-player-background={background ? backgroundMode : undefined} data-visual-effects={appearance.ready && appearance.snapshot.settings.visualEffectsEnabled ? "true" : "false"} aria-label="PLIX" onMouseDown={startWindowDrag} onContextMenuCapture={showPlayerContextMenu}
       style={{ ...productionStyle, "--artwork-accent-dark": palette.dark, "--artwork-accent-light": palette.light,
         "--artwork-tint": palette.tint, "--ambient-1": palette.ambient[0],
-        "--ambient-2": palette.ambient[1], "--ambient-3": palette.ambient[2] } as CSSProperties}>
+        "--ambient-2": palette.ambient[1], "--ambient-3": palette.ambient[2],
+        ...(background ? { "--player-background": background } : {}) } as CSSProperties}>
       <VisualizerLayer preset={appearance.ready && appearance.snapshot.settings.visualEffectsEnabled ? appearance.snapshot.settings.visualization : "Off"} palette={palette} hybridPaletteEnabled={appearance.snapshot.settings.hybridPaletteEnabled} />
       <button className="artwork" type="button" aria-label="Открыть Яндекс Музыку"
         title={error || "Открыть Яндекс Музыку"} disabled={openingYandex} aria-busy={openingYandex}
@@ -494,7 +553,7 @@ function App() {
           <div className="times"><span>{formatTime(displayed)}</span><span>{formatTime(duration)}</span></div>
         </div>
         <div className="player-footer">
-          <VolumeControl />
+          <VolumeControl key={source.revision} enabled={source.mode === "desktop"} />
           <div className="controls">
             <button aria-label="Предыдущий трек" title="Предыдущий трек" disabled={!canTransport(media, "previous_track") || busy} onClick={() => void control("previous_track")}><Icon name="previous" /></button>
             <button className="primary-control" aria-label={playing ? "Пауза" : "Воспроизвести"} title={playing ? "Пауза" : "Воспроизвести"} disabled={!canTransport(media, "play_pause") || busy} onClick={() => void control("play_pause")}><Icon name={playing ? "pause" : "play"} /></button>
@@ -508,7 +567,9 @@ function App() {
 }
 
 const appearanceWindow = new URLSearchParams(window.location.search).get("window") === "appearance";
-if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("window") === "visual-tuning") {
+if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("window") === "media-sources") {
+  void import("./dev/media_sources");
+} else if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("window") === "visual-tuning") {
   void import("./dev/visual_tuning_panel");
 } else {
   createRoot(document.getElementById("root")!).render(appearanceWindow ? <AppearanceWindow /> : <App />);

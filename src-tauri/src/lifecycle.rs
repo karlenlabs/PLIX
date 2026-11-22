@@ -473,6 +473,8 @@ fn activate_existing(app: &tauri::AppHandle) -> Result<(), String> {
     }
     #[cfg(not(test))]
     let window = app.get_webview_window("main");
+    #[cfg(test)]
+    let window: Option<tauri::WebviewWindow> = None;
     let Some(window) = window else {
         return Ok(()); // An early launch must not create a window ahead of setup.
     };

@@ -23,6 +23,8 @@ export const cssParameters = {
   "--play-pause-glow-blur": [0,60,"px"],
   "--control-background-opacity": [0,1,""],
   "--muted-control-opacity": [0,1,""],
+  "--visualizer-opacity": [0,1,""],
+  "--visualizer-brightness": [0.2,2,""],
   "--shadow-opacity": [0,1,""],
   "--shadow-blur": [0,40,"px"],
   "--shadow-spread": [-20,20,"px"],

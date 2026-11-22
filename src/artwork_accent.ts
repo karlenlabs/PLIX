@@ -3,6 +3,12 @@ export type ArtworkPalette = {
   light: string;
   tint: string;
   ambient: [string, string, string];
+  // Light range of colorless artwork (HSL lightness 0-1). Set only on the
+  // neutral fallback, so Hybrid Palette can glow with the artwork's own light.
+  tone?: { low: number; high: number };
+  // A real second color of the artwork (e.g. orange hair on a pale-blue cover),
+  // pooled across neighboring hue buckets so a spread-out color is not lost.
+  accent?: { hue: number; saturation: number };
 };
 type RGB = [number, number, number];
 
@@ -70,10 +76,27 @@ function ambientColors(buckets: ColorBucket[], dominant: ColorBucket, opaque: nu
   }) as ArtworkPalette["ambient"];
 }
 
+function secondaryAccent(buckets: ColorBucket[], dominantHue: number, opaque: number) {
+  let best: { hue: number; saturation: number; weight: number } | undefined;
+  for (let i = 0; i < buckets.length; i++) {
+    const pool = [buckets[(i + 23) % 24], buckets[i], buckets[(i + 1) % 24]];
+    const weight = pool.reduce((n, b) => n + b.weight, 0);
+    if (!weight || weight < opaque * .05) continue;
+    const x = pool.reduce((n, b) => n + b.x, 0), y = pool.reduce((n, b) => n + b.y, 0);
+    const hue = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    const distance = Math.min(Math.abs(hue - dominantHue), 360 - Math.abs(hue - dominantHue));
+    const saturation = pool.reduce((n, b) => n + b.saturation, 0) / weight;
+    if (distance < 45 || saturation < .35) continue;
+    if (!best || weight > best.weight) best = { hue, saturation, weight };
+  }
+  return best && { hue: best.hue, saturation: best.saturation };
+}
+
 // Run only when an artwork image loads, never during the media polling loop.
 export function paletteFromPixels(pixels: ArrayLike<number>): ArtworkPalette {
   const buckets = Array.from({ length: 24 }, () => ({ weight: 0, x: 0, y: 0, saturation: 0 }));
   let opaque = 0, colorful = 0;
+  const lightnesses: number[] = [];
   for (let index = 0; index + 3 < pixels.length; index += 4) {
     const alpha = pixels[index + 3];
     if (!Number.isFinite(alpha) || alpha < 224 || alpha > 255) continue;
@@ -82,6 +105,7 @@ export function paletteFromPixels(pixels: ArrayLike<number>): ArtworkPalette {
     opaque++;
     const max = Math.max(r, g, b), min = Math.min(r, g, b), chroma = max - min;
     const lightness = (max + min) / 2;
+    lightnesses.push(lightness);
     if (chroma < .08 || lightness < .12 || lightness > .9) continue;
     const saturation = chroma / (1 - Math.abs(2 * lightness - 1));
     if (saturation < .15) continue;
@@ -95,16 +119,20 @@ export function paletteFromPixels(pixels: ArrayLike<number>): ArtworkPalette {
     bucket.y += Math.sin(hue * Math.PI / 180) * weight;
     bucket.saturation += saturation * weight;
   }
+  lightnesses.sort((a, b) => a - b);
+  const at = (q: number) => lightnesses[Math.min(lightnesses.length - 1, Math.floor(q * lightnesses.length))];
+  const neutral = (): ArtworkPalette => opaque ? { ...NEUTRAL_PALETTE, tone: { low: at(.15), high: at(.85) } } : NEUTRAL_PALETTE;
   // Ignore tiny colored specks on otherwise neutral artwork.
-  if (!opaque || colorful / opaque < .05) return NEUTRAL_PALETTE;
+  if (!opaque || colorful / opaque < .05) return neutral();
   const dominant = buckets.reduce((best, bucket) => bucket.weight > best.weight ? bucket : best);
-  if (!dominant.weight) return NEUTRAL_PALETTE;
+  if (!dominant.weight) return neutral();
   const { hue, saturation } = bucketColor(dominant);
   return {
     dark: accessibleAccent(hue, saturation, true),
     light: accessibleAccent(hue, saturation, false),
     tint: hslToRgb(hue, saturation, .6).join(", "),
     ambient: ambientColors(buckets, dominant, opaque),
+    accent: secondaryAccent(buckets, hue, opaque),
   };
 }
 

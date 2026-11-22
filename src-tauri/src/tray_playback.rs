@@ -12,7 +12,7 @@ enum PlaybackIcon {
 }
 
 impl PlaybackIcon {
-    fn from_read(read: &Result<Option<MediaState>, String>) -> Self {
+    fn from_read(read: &Result<Option<&MediaState>, String>) -> Self {
         match read
             .as_ref()
             .ok()
@@ -89,7 +89,7 @@ pub fn setup(app: &tauri::App, neutral: Image<'static>) {
 }
 
 // Observe the existing GSMTC read result. No session query, timer or subscription here.
-pub fn sync(app: &tauri::AppHandle, read: &Result<Option<MediaState>, String>) {
+pub fn sync(app: &tauri::AppHandle, read: &Result<Option<&MediaState>, String>) {
     let Some(state) = app.try_state::<TrayPlayback>() else {
         return; // A read during startup/shutdown must not affect media IPC.
     };
@@ -196,4 +196,3 @@ fn symbol_image(icon: PlaybackIcon, size: u32) -> Image<'static> {
     }
     Image::new_owned(rgba, size, size)
 }
-

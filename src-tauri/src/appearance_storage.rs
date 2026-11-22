@@ -79,6 +79,7 @@ fn decode(bytes: &[u8]) -> Result<StoredSettings, (Problem, String)> {
             "ambientHazeEnabled",
             "ambientHazeIntensity",
             "hybridPaletteEnabled",
+            "playerBackground",
             "main_window_position",
             "opacity",
             "blurPx",
@@ -106,6 +107,7 @@ fn decode(bytes: &[u8]) -> Result<StoredSettings, (Problem, String)> {
                 "visualization",
                 &["Off", "Karlen Baseline", "Karlen Dense", "Karlen 3"][..],
             ),
+            ("playerBackground", &["classic", "artwork", "deep"][..]),
         ]
         .into_iter()
         .find_map(|(key, allowed)| {

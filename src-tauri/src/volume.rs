@@ -15,6 +15,7 @@ use windows::Win32::System::Threading::{
 #[serde(rename_all = "camelCase")]
 pub(crate) struct AudioVolume {
     pub session_id: String,
+    pub source_revision: String,
     level: f32,
     muted: bool,
 }
@@ -257,6 +258,7 @@ impl VolumeSessionOwner {
                 }
                 Ok(Some(AudioVolume {
                     session_id: selected.session.session_id.clone(),
+                    source_revision: String::new(),
                     level: request.read(|| selected.volume.GetMasterVolume())?,
                     muted: request.read(|| selected.volume.GetMute())?.as_bool(),
                 }))
@@ -268,5 +270,3 @@ impl VolumeSessionOwner {
         result
     }
 }
-
-

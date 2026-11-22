@@ -29,6 +29,7 @@ button, input { font: inherit; }
 @property --ambient-1 { syntax: "<color>"; inherits: true; initial-value: rgb(116, 139, 165); }
 @property --ambient-2 { syntax: "<color>"; inherits: true; initial-value: rgb(117, 120, 153); }
 @property --ambient-3 { syntax: "<color>"; inherits: true; initial-value: rgb(104, 140, 145); }
+@property --player-background { syntax: "<color>"; inherits: true; initial-value: #222831; }
 /* The transparent inset leaves room for the CSS shadow inside the native window. */
 .player {
   --accent: var(--artwork-accent-dark, #c4cbd4);
@@ -43,6 +44,8 @@ button, input { font: inherit; }
   --surface-brightness: 1;
   --surface-saturation: 1;
   --player-radius: 24px;
+  --visualizer-opacity: 1;
+  --visualizer-brightness: 1;
   --ambient-blur: 28px;
   --ambient-opacity: .45;
   --ambient-saturation: 1;
@@ -87,8 +90,11 @@ button, input { font: inherit; }
     inset 1px 0 0 rgba(var(--player-highlight), var(--left-edge-highlight-opacity)),
     var(--shadow-offset-x) var(--shadow-offset-y) var(--shadow-blur) var(--shadow-spread) rgba(0, 0, 0, var(--shadow-opacity));
   user-select: none;
-  transition: --ambient-1 .7s ease, --ambient-2 .7s ease, --ambient-3 .7s ease;
+  transition: --ambient-1 .7s ease, --ambient-2 .7s ease, --ambient-3 .7s ease, --player-background .7s ease;
 }
+/* Appearance > Фон плеера (dark theme only). !important wins over the inline
+   production --design-base-color, so the surface and blob contrast both use it. */
+:root:not([data-theme="light"]) .player[data-player-background] { --design-base-color: var(--player-background) !important; }
 /* Blur only our own artwork colors; the desktop is never sampled. */
 .player::before {
   content: ""; position: absolute; inset: 6px 14px -4px; z-index: -2;
@@ -281,6 +287,8 @@ input[type="range"]:disabled { cursor: default; opacity: .5; }
 .player > .visualizer-layer {
   position: absolute; inset: 0; z-index: 0; overflow: hidden;
   border-radius: inherit; pointer-events: none; contain: paint;
+  /* Blob opacity/brightness (Visual Tuning > Blobs); applied after Hybrid Palette. */
+  opacity: var(--visualizer-opacity, 1); filter: brightness(var(--visualizer-brightness, 1));
 }
 .visualizer-layer canvas { display: block; width: 100%; height: 100%; pointer-events: none; }
 .player > .artwork, .player > .content { position: relative; z-index: 1; }

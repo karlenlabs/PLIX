@@ -111,15 +111,20 @@ export function smartPalette(palette: ArtworkPalette, original: BlobColors, sett
     original: [...original], final: [...original], analysis, manual,
     accentRecovery: { algorithm: "contrast", referenceTarget: null, targets: [null, null, null], strengths: [0, 0, 0], effectiveStrength: 0 },
     correction: { enabled: p.enabled, requestedStrength: p.strength, effectiveStrength: 0, strengths: [0, 0, 0] } };
-  const fallbackTones: HSL[] = [{ h: 212, s: .28, l: .55 }, { h: 28, s: .3, l: .53 }];
-  const recovery = analysis.recovery;
-  if (recovery.slotNeeds[1] > 0) state.accentRecovery.targets[1] = contrastAccent(fallbackTones[0], background);
+  // Accent Recovery for a one-color palette. It never adds the complementary
+  // hue: opposite colors blur into gray mud between the blobs. It uses the
+  // artwork's real second color when there is one, otherwise a cleaner
+  // neighboring hue of the same family (beige -> peach-rose, blue -> periwinkle).
+  const recovery = analysis.recovery, primary = analysis.quality[0];
+  const shift = primary.h < 75 || primary.h >= 300 ? -22 : 24;
+  const neighbor = (direction: number): HSL => ({ h: (primary.h + shift * direction + 360) % 360,
+    s: Math.min(.55, Math.max(.42, primary.s + .12)), l: .62 });
+  if (recovery.slotNeeds[1] > 0) state.accentRecovery.targets[1] = contrastAccent(neighbor(-1), background);
   if (recovery.slotNeeds[2] > 0) {
-    const harmonic = rgb(fromHSL({ h: (recovery.hue + 180) % 360, s: .38, l: .56 }));
-    const reserved = rgb(fromHSL(fallbackTones[1]));
-    // Neutral hue is undefined: fade to the restrained warm reserve instead of saturating gray.
-    const target = hex(harmonic.map((v, j) => v + (reserved[j] - v) * recovery.neutralNeed) as [number, number, number]);
-    const reference = contrastAccent(paletteHSL(target), background);
+    const tone = palette.accent
+      ? { h: palette.accent.hue, s: Math.min(.62, Math.max(.45, palette.accent.saturation)), l: .58 }
+      : neighbor(1);
+    const reference = contrastAccent(tone, background);
     state.accentRecovery.referenceTarget = reference;
     state.accentRecovery.targets[2] = contrastAccentVariant(reference, background, paletteHSL(reference));
   }
@@ -144,7 +149,10 @@ export function smartPalette(palette: ArtworkPalette, original: BlobColors, sett
     // Scale the single combined correction by the slider, preserving a linear 0–100% blend.
     const strength = p.strength * need;
     state.correction.strengths[i] = strength;
-    state.final[i] = hex(from.map((v, j) => v + (to[j] - v) * strength / 100) as [number, number, number]);
+    // A recovered accent is applied as a whole color: an RGB blend between two
+    // distant hues (blue -> orange) passes through gray and reads as dirt.
+    state.final[i] = recovered && recoveryNeed > 0 && recoveryNeed >= source.need ? hex(to)
+      : hex(from.map((v, j) => v + (to[j] - v) * strength / 100) as [number, number, number]);
   }
   state.accentRecovery.effectiveStrength = Math.max(...state.accentRecovery.strengths);
   state.correction.effectiveStrength = Math.max(...state.correction.strengths);

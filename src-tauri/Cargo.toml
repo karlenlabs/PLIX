@@ -1,6 +1,6 @@
 [package]
 name = "ympleer-v2"
-version = "0.1.0"
+version = "1.1.0"
 description = "PLIX"
 edition = "2021"
 default-run = "plix"
@@ -8,6 +8,14 @@ default-run = "plix"
 [[bin]]
 name = "plix"
 path = "src/main.rs"
+
+[[bin]]
+name = "plix-gsmtc-diagnostics"
+path = "src/bin/gsmtc_diagnostics.rs"
+required-features = ["gsmtc-diagnostics"]
+
+[features]
+gsmtc-diagnostics = []
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

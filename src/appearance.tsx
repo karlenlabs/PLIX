@@ -7,10 +7,11 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { VisualPreset } from "./visualizer/controller";
 import { installAppearanceLifecycle, type FlushRequest } from "./appearance_lifecycle";
 
-type Settings = { theme: "system" | "dark" | "light"; alwaysOnTop: boolean; visualization: VisualPreset; visualEffectsEnabled: boolean; ambientHazeEnabled: boolean; ambientHazeIntensity: number; hybridPaletteEnabled: boolean };
+type Settings = { theme: "system" | "dark" | "light"; alwaysOnTop: boolean; visualization: VisualPreset; visualEffectsEnabled: boolean; ambientHazeEnabled: boolean; ambientHazeIntensity: number; hybridPaletteEnabled: boolean; playerBackground: PlayerBackground };
+export type PlayerBackground = "classic" | "artwork" | "deep";
 type SettingsPatch = Partial<Settings>;
 type AppearanceSnapshot = { settings: Settings; revision: number; saveError: string | null };
-const defaults: Settings = { theme: "system", alwaysOnTop: true, visualization: "Karlen Dense", visualEffectsEnabled: true, ambientHazeEnabled: false, ambientHazeIntensity: 35, hybridPaletteEnabled: true };
+const defaults: Settings = { theme: "system", alwaysOnTop: true, visualization: "Karlen Dense", visualEffectsEnabled: true, ambientHazeEnabled: false, ambientHazeIntensity: 35, hybridPaletteEnabled: true, playerBackground: "classic" };
 
 export function startWindowDrag(event: MouseEvent<HTMLElement>) {
   if (event.button !== 0 || !(event.target instanceof Element)) return;
@@ -221,6 +222,15 @@ export function AppearanceWindow() {
         <input type="checkbox" role="switch" aria-label="Ambient Haze"
           checked={draft.ambientHazeEnabled} disabled={!ready || closing || !draft.visualEffectsEnabled}
           onChange={event => update({ ambientHazeEnabled: event.currentTarget.checked })} />
+      </label>
+      <label className="visualization-field">
+        <span>Фон плеера</span>
+        <select aria-label="Фон плеера" value={draft.playerBackground} disabled={!ready || closing}
+          onChange={event => update({ playerBackground: event.currentTarget.value as PlayerBackground })}>
+          <option value="classic">Классический</option>
+          <option value="artwork">Под обложку</option>
+          <option value="deep">Глубокий</option>
+        </select>
       </label>
       <div className="appearance-message" role="status" title={snapshot.saveError || message}>{message}</div>
     </main>

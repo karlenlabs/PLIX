@@ -1,0 +1,13 @@
+body.media-sources-dev { margin: 0; background: #181a20; color: #e7eaf0; overflow: auto; }
+.media-sources-dev #root { overflow: auto; background: #181a20; }
+.media-sources-panel { display: block; width: auto; height: auto; padding: 24px; font: 14px/1.5 system-ui, sans-serif; user-select: text; }
+.media-sources-panel h1 { font-size: 23px; white-space: normal; }
+.media-sources-panel p { white-space: normal; overflow-wrap: anywhere; margin: 12px 0; }
+.media-sources-panel button { background: #343b4b; color: #fff; border: 1px solid #69758c; border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+.media-sources-panel button:disabled { opacity: .45; cursor: default; }
+.media-sources-panel .source-actions { display: flex; gap: 8px; }
+.media-sources-panel ul { padding: 0; list-style: none; }
+.media-sources-panel li { margin: 16px 0; border: 1px solid #50596d; border-radius: 8px; padding: 16px; overflow-wrap: anywhere; }
+.media-sources-panel pre { white-space: pre-wrap; user-select: text; }
+.media-sources-panel .source-error { color: #ffb6a6; }
+.media-sources-panel input[type="checkbox"] { width: auto; height: auto; margin-right: 8px; }

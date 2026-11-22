@@ -21,6 +21,17 @@ pub enum Theme {
     Light,
 }
 
+/// Player background: the classic surface, a near-black tint of the artwork's
+/// hue, or one fixed deep teal.
+#[derive(Clone, Copy, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum PlayerBackground {
+    #[default]
+    Classic,
+    Artwork,
+    Deep,
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum Visualization {
     Off,
@@ -50,6 +61,8 @@ pub struct Settings {
     pub ambient_haze_intensity: f64,
     #[serde(rename = "hybridPaletteEnabled")]
     pub hybrid_palette_enabled: bool,
+    #[serde(rename = "playerBackground")]
+    pub player_background: PlayerBackground,
 }
 
 #[derive(serde::Deserialize)]
@@ -78,6 +91,8 @@ struct StoredAppearance {
         rename = "hybridPaletteEnabled"
     )]
     hybrid_palette_enabled: bool,
+    #[serde(default, rename = "playerBackground")]
+    player_background: PlayerBackground,
 }
 
 fn default_hybrid_palette_enabled() -> bool {
@@ -119,6 +134,7 @@ impl From<StoredAppearance> for Settings {
             ambient_haze_enabled: stored.ambient_haze_enabled,
             ambient_haze_intensity: stored.ambient_haze_intensity,
             hybrid_palette_enabled: stored.hybrid_palette_enabled,
+            player_background: stored.player_background,
         }
     }
 }
@@ -137,6 +153,7 @@ impl Default for Settings {
             ambient_haze_enabled: false,
             ambient_haze_intensity: default_haze_intensity(),
             hybrid_palette_enabled: true,
+            player_background: PlayerBackground::default(),
         }
     }
 }
@@ -188,6 +205,8 @@ pub struct SettingsPatch {
     ambient_haze_intensity: Option<f64>,
     #[serde(default, deserialize_with = "patch_value")]
     hybrid_palette_enabled: Option<bool>,
+    #[serde(default, deserialize_with = "patch_value")]
+    player_background: Option<PlayerBackground>,
 }
 
 fn patch_haze_intensity<'de, D: serde::Deserializer<'de>>(
@@ -229,6 +248,7 @@ impl SettingsPatch {
             hybrid_palette_enabled: self
                 .hybrid_palette_enabled
                 .unwrap_or(current.hybrid_palette_enabled),
+            player_background: self.player_background.unwrap_or(current.player_background),
         }
     }
 }

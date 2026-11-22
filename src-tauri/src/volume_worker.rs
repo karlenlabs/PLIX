@@ -1,3 +1,4 @@
+use crate::media_source::SourceGate;
 use crate::volume::{AudioVolume, VolumeChange, VolumeSessionOwner};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{mpsc, Arc, Mutex};
@@ -45,9 +46,14 @@ pub(crate) struct RequestControl {
     gate: Arc<Gate>,
     generation: u64,
     deadline: Instant,
+    source: (SourceGate, String),
 }
 impl RequestControl {
     pub(crate) fn check(&self) -> windows::core::Result<()> {
+        self.source
+            .0
+            .check(&self.source.1, true)
+            .map_err(crate::source_error)?;
         if !self.gate.valid(self.generation) || Instant::now() >= self.deadline {
             return Err(windows::core::Error::new(
                 windows::core::HRESULT(0x800705B4_u32 as i32),
@@ -69,6 +75,12 @@ impl RequestControl {
         &self,
         call: impl FnOnce() -> windows::core::Result<T>,
     ) -> windows::core::Result<T> {
+        // Validate immediately before the setter, not merely when IPC was queued.
+        let _source_permit = self
+            .source
+            .0
+            .admit(&self.source.1, true)
+            .map_err(crate::source_error)?;
         self.check()?;
         self.gate
             .0
@@ -264,7 +276,12 @@ impl Supervisor {
         });
         Ok(())
     }
-    fn submit(self: &Arc<Self>, target: Target, now: Instant) -> Result<Ticket, String> {
+    fn submit(
+        self: &Arc<Self>,
+        target: Target,
+        now: Instant,
+        source: (SourceGate, String),
+    ) -> Result<Ticket, String> {
         if self.gate.stopped() {
             return Err("Audio worker shut down".into());
         }
@@ -281,6 +298,7 @@ impl Supervisor {
             gate: self.gate.clone(),
             generation,
             deadline,
+            source,
         };
         control.check().map_err(|error| error.to_string())?;
         let (reply, response) = mpsc::channel(); // one reply, nonblocking sender
@@ -411,12 +429,70 @@ impl Drop for VolumeWorker {
         self.shutdown();
     }
 }
-pub(crate) async fn send_volume(worker: &VolumeWorker, target: Target) -> Reply {
-    let ticket = worker.supervisor.submit(target, Instant::now())?;
+pub(crate) async fn send_volume(
+    worker: &VolumeWorker,
+    target: Target,
+    source: SourceGate,
+    revision: Option<String>,
+) -> Reply {
+    let revision = match revision {
+        Some(revision) => revision,
+        None if target.is_none() => source.view()?.revision,
+        None => return Err("Volume write requires the original source revision".into()),
+    };
+    source.check(&revision, true)?;
+    let ticket =
+        worker
+            .supervisor
+            .submit(target, Instant::now(), (source.clone(), revision.clone()))?;
     // A stalled lane admits at most one running and one queued request.
     // Full/busy/shutdown errors return before spawning a blocking waiter.
-    tauri::async_runtime::spawn_blocking(move || ticket.wait())
+    let mut result = tauri::async_runtime::spawn_blocking(move || ticket.wait())
         .await
-        .map_err(|error| error.to_string())?
+        .map_err(|error| error.to_string())??;
+    source.check(&revision, true)?;
+    if let Some(volume) = result.as_mut() {
+        volume.source_revision = revision;
+    }
+    Ok(result)
 }
 
+#[cfg(test)]
+mod source_tests {
+    use super::*;
+    use crate::media_source::SourceMode;
+
+    #[test]
+    fn queued_desktop_setter_is_never_called_after_browser_switch() {
+        let source = SourceGate::default();
+        let desktop = source.view().unwrap();
+        let gate = Arc::new(Gate::default());
+        gate.start(1).unwrap();
+        let request = RequestControl {
+            gate,
+            generation: 1,
+            deadline: Instant::now() + Duration::from_secs(1),
+            source: (source.clone(), desktop.revision.clone()),
+        };
+        let browser = source
+            .change(&desktop.revision, SourceMode::Browser, None)
+            .unwrap();
+        let mut writes = 0;
+        assert!(request
+            .write(|| {
+                writes += 1;
+                Ok(())
+            })
+            .is_err());
+        source
+            .change(&browser.revision, SourceMode::Desktop, None)
+            .unwrap();
+        assert!(request
+            .write(|| {
+                writes += 1;
+                Ok(())
+            })
+            .is_err());
+        assert_eq!(writes, 0);
+    }
+}
